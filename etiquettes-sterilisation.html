@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Étiquettes Stérilisation</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500&display=swap');
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: #fdf9fb;
+  color: #2D0A18;
+  min-height: 100vh;
+}
+
+/* ── FORMULAIRE ── */
+.form-wrap {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 28px 20px 40px;
+}
+
+h1 {
+  font-size: 20px;
+  font-weight: 500;
+  color: #9E2A4F;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.field { margin-bottom: 14px; }
+.field label {
+  display: block;
+  font-size: 11px;
+  font-weight: 500;
+  color: #B88FA0;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  margin-bottom: 5px;
+}
+.field input, .field select {
+  width: 100%;
+  border: 1.5px solid #F4C0D1;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 15px;
+  font-family: inherit;
+  color: #2D0A18;
+  background: white;
+  -webkit-appearance: none;
+  transition: border-color 0.15s;
+}
+.field input:focus, .field select:focus {
+  outline: none;
+  border-color: #C73D6B;
+}
+
+.row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+/* Instruments */
+.instr-label {
+  font-size: 11px;
+  font-weight: 500;
+  color: #B88FA0;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  margin-bottom: 8px;
+}
+.instr-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 8px; }
+.instr-row { display: flex; gap: 8px; align-items: center; }
+.instr-row input {
+  flex: 1;
+  border: 1.5px solid #F4C0D1;
+  border-radius: 8px;
+  padding: 9px 12px;
+  font-size: 14px;
+  font-family: inherit;
+  color: #2D0A18;
+  background: white;
+}
+.instr-row input:focus { outline: none; border-color: #7B3399; }
+.btn-del {
+  background: none;
+  border: none;
+  color: #F4C0D1;
+  cursor: pointer;
+  font-size: 18px;
+  line-height: 1;
+  padding: 4px;
+  transition: color 0.15s;
+}
+.btn-del:hover { color: #C73D6B; }
+
+.btn-add-instr {
+  background: none;
+  border: 1.5px dashed #d9a8e8;
+  border-radius: 8px;
+  padding: 8px;
+  font-size: 13px;
+  font-family: inherit;
+  color: #7B3399;
+  cursor: pointer;
+  width: 100%;
+  margin-bottom: 24px;
+  transition: background 0.15s;
+}
+.btn-add-instr:hover { background: #f8f0fa; }
+
+/* Rapide */
+.quick {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-bottom: 16px;
+}
+.quick-lbl {
+  width: 100%;
+  font-size: 11px;
+  color: #B88FA0;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  margin-bottom: 3px;
+}
+.qb {
+  font-size: 12px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  border: 1px solid #d9a8e8;
+  background: white;
+  color: #7B3399;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s;
+}
+.qb:hover { background: #7B3399; color: white; border-color: #7B3399; }
+
+/* Bouton principal */
+.btn-go {
+  width: 100%;
+  background: #C73D6B;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 14px;
+  font-size: 16px;
+  font-family: inherit;
+  font-weight: 500;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+.btn-go:hover { opacity: 0.88; }
+
+/* ════════════════════════════
+   ÉCRAN D'IMPRESSION
+════════════════════════════ */
+#print-screen {
+  display: none;
+  padding: 20px;
+  max-width: 700px;
+  margin: 0 auto;
+}
+.print-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.print-header h2 { font-size: 16px; font-weight: 500; color: #9E2A4F; }
+.print-btns { display: flex; gap: 8px; }
+.btn-back {
+  background: white;
+  color: #C73D6B;
+  border: 1.5px solid #F4C0D1;
+  border-radius: 8px;
+  padding: 9px 16px;
+  font-size: 13px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.btn-back:hover { background: #FBEAF0; }
+.btn-print {
+  background: #C73D6B;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 9px 16px;
+  font-size: 13px;
+  font-family: inherit;
+  font-weight: 500;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+.btn-print:hover { opacity: 0.88; }
+
+/* Grille d'étiquettes */
+.etiq-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6mm;
+  justify-content: flex-start;
+}
+
+/* ════════════════════════════
+   ÉTIQUETTE — format 38×25mm
+   (Avery L7159 ou Brother DK)
+════════════════════════════ */
+.etiq {
+  width: 38mm;
+  height: 25mm;
+  background: white;
+  border: 0.5px solid #ccc;
+  border-radius: 2px;
+  display: flex;
+  align-items: center;
+  gap: 3mm;
+  padding: 2mm 2.5mm;
+  overflow: hidden;
+  page-break-inside: avoid;
+  break-inside: avoid;
+}
+
+/* QR — prend toute la hauteur disponible */
+.etiq-qr { flex-shrink: 0; }
+.etiq-qr canvas, .etiq-qr img {
+  width: 18mm !important;
+  height: 18mm !important;
+  display: block;
+}
+
+/* Infos texte */
+.etiq-info { flex: 1; min-width: 0; }
+.etiq-num {
+  font-size: 7.5pt;
+  font-weight: 500;
+  color: #9E2A4F;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.2;
+  font-family: 'DM Sans', sans-serif;
+}
+.etiq-instr {
+  font-size: 7pt;
+  color: #2D0A18;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.2;
+  font-weight: 500;
+  font-family: 'DM Sans', sans-serif;
+}
+.etiq-line {
+  font-size: 6pt;
+  color: #888;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.3;
+  font-family: 'DM Sans', sans-serif;
+}
+.etiq-dlu {
+  font-size: 6.5pt;
+  font-weight: 500;
+  margin-top: 1mm;
+  padding: 0.5mm 2mm;
+  border-radius: 2px;
+  display: inline-block;
+  font-family: 'DM Sans', sans-serif;
+}
+.dlu-ok   { background: #EAF3DE; color: #2d7a50; }
+.dlu-warn { background: #FAEEDA; color: #854F0B; }
+.dlu-exp  { background: #FCEBEB; color: #A32D2D; }
+
+/* ── PRINT ── */
+@media print {
+  .form-wrap, .print-header { display: none !important; }
+  #print-screen { display: block !important; padding: 0; max-width: none; }
+  body { background: white; }
+  .etiq-grid { gap: 3mm; }
+  .etiq { border: 0.3px solid #ccc; }
+}
+</style>
+</head>
+<body>
+
+<!-- ════ FORMULAIRE ════ -->
+<div class="form-wrap" id="form-screen">
+
+  <h1>🛡️ Étiquettes stérilisation</h1>
+
+  <div class="row">
+    <div class="field">
+      <label>N° de cycle</label>
+      <input type="text" id="num" placeholder="C-0090" value="C-0090">
+    </div>
+    <div class="field">
+      <label>Date</label>
+      <input type="date" id="date">
+    </div>
+  </div>
+
+  <div class="field">
+    <label>Programme</label>
+    <select id="prog">
+      <option>134°C — 18 min</option>
+      <option>134°C — 3,5 min</option>
+      <option>121°C — 15 min</option>
+    </select>
+  </div>
+
+  <div class="field">
+    <label>DLU (se calcule auto)</label>
+    <input type="text" id="dlu" readonly placeholder="Choisir conditionnement…" style="background:#f5f2f4;color:#6B4555">
+  </div>
+
+  <div class="field">
+    <label>Conditionnement</label>
+    <select id="cond" onchange="calcDLU()">
+      <option value="180">Sachet scellé — 6 mois</option>
+      <option value="90">Sachet simple — 3 mois</option>
+      <option value="365">Conteneur rigide — 12 mois</option>
+      <option value="7">Non conditionné — 7 jours</option>
+    </select>
+  </div>
+
+  <div style="margin-bottom:8px">
+    <div class="instr-label">Instruments — 1 ligne = 1 sachet</div>
+    <div class="quick">
+      <span class="quick-lbl">Ajout rapide ↓</span>
+    </div>
+    <div class="instr-list" id="instrList"></div>
+    <button class="btn-add-instr" onclick="addRow('')">+ Ajouter un instrument</button>
+  </div>
+
+  <button class="btn-go" onclick="generer()">Générer les étiquettes →</button>
+
+</div>
+
+<!-- ════ IMPRESSION ════ -->
+<div id="print-screen">
+  <div class="print-header">
+    <h2 id="print-title">Étiquettes prêtes</h2>
+    <div class="print-btns">
+      <button class="btn-back" onclick="retour()">← Modifier</button>
+      <button class="btn-print" onclick="window.print()">🖨 Imprimer</button>
+    </div>
+  </div>
+  <div class="etiq-grid" id="etiqGrid"></div>
+</div>
+
+<script>
+var INSTRS = [
+  'Miroir n°4','Miroir n°5','Sonde paro','Sonde exploratrice','Précelle',
+  'Curette G. 5/6','Curette G. 7/8','Curette G. 11/12','Curette G. 13/14','Faucille H6/H7',
+  'Davier 150','Davier 151','Davier 53',
+  'Élévateur droit','Élévateur courbe','Curette chir.','Porte-aiguille','Ciseaux',
+  'Porte-lime','Règle mesure','Fouloir endo',
+  'Fouloir compo','Brunissoir','Spatule résine','Spatule ciment'
+];
+
+/* Init */
+(function(){
+  document.getElementById('date').value = new Date().toISOString().slice(0,10);
+
+  /* Boutons rapides */
+  var q = document.querySelector('.quick');
+  INSTRS.forEach(function(n){
+    var b = document.createElement('button');
+    b.className = 'qb'; b.textContent = n;
+    b.onclick = function(){ addRow(n); };
+    q.appendChild(b);
+  });
+
+  /* 3 lignes par défaut */
+  addRow('Miroir n°5');
+  addRow('Sonde paro');
+  addRow('Précelle');
+  calcDLU();
+})();
+
+document.getElementById('date').addEventListener('change', calcDLU);
+
+/* Calcul DLU */
+function calcDLU(){
+  var s = document.getElementById('date').value;
+  var n = parseInt(document.getElementById('cond').value);
+  if(!s){ document.getElementById('dlu').value=''; return; }
+  var d = new Date(s+'T00:00:00');
+  d.setDate(d.getDate()+n);
+  document.getElementById('dlu').value = d.toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit',year:'numeric'});
+}
+
+function getDiff(){
+  var dluTxt = document.getElementById('dlu').value;
+  if(!dluTxt) return 999;
+  var parts = dluTxt.split('/');
+  if(parts.length!==3) return 999;
+  var d = new Date(parts[2]+'-'+parts[1]+'-'+parts[0]);
+  return Math.round((d - new Date())/86400000);
+}
+
+/* Lignes instruments */
+function addRow(val){
+  var list = document.getElementById('instrList');
+  var row = document.createElement('div');
+  row.className = 'instr-row';
+  row.innerHTML =
+    '<input type="text" placeholder="Nom de l\'instrument" value="'+(val||'')+'">' +
+    '<button class="btn-del" onclick="this.parentElement.remove()" title="Supprimer">×</button>';
+  list.appendChild(row);
+  if(!val) row.querySelector('input').focus();
+}
+
+function getInstrs(){
+  var out = [];
+  document.querySelectorAll('.instr-row input').forEach(function(inp,i){
+    var v = inp.value.trim();
+    if(v) out.push({n:i+1, nom:v});
+  });
+  return out;
+}
+
+/* Générer */
+function generer(){
+  var num    = document.getElementById('num').value.trim() || 'C-?';
+  var date   = document.getElementById('date').value;
+  var prog   = document.getElementById('prog').value;
+  var dlu    = document.getElementById('dlu').value || '—';
+  var diff   = getDiff();
+  var instrs = getInstrs();
+
+  if(instrs.length === 0){ alert('Ajoute au moins un instrument.'); return; }
+
+  var grid = document.getElementById('etiqGrid');
+  grid.innerHTML = '';
+
+  var dateStr = date ? new Date(date+'T00:00:00').toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit',year:'numeric'}) : '—';
+  var dluClass = diff > 30 ? 'dlu-ok' : diff > 0 ? 'dlu-warn' : 'dlu-exp';
+  var dluLabel = (diff > 30 ? '✓ ' : diff > 0 ? '⚠ ' : '✗ ') + 'DLU ' + dlu;
+
+  instrs.forEach(function(instr, idx){
+    var lotNum = num + '-' + String(instr.n).padStart(2,'0');
+
+    /* QR data — minimaliste */
+    var qrData = [lotNum, dateStr, 'DLU:'+dlu, prog].join(' | ');
+
+    /* Étiquette */
+    var div = document.createElement('div');
+    div.className = 'etiq';
+    div.innerHTML =
+      '<div class="etiq-qr" id="qr-'+idx+'"></div>' +
+      '<div class="etiq-info">' +
+        '<div class="etiq-num">' + lotNum + '</div>' +
+        '<div class="etiq-instr">' + instr.nom + '</div>' +
+        '<div class="etiq-line">' + dateStr + '</div>' +
+        '<div class="etiq-line">' + prog + '</div>' +
+        '<div class="etiq-dlu ' + dluClass + '">' + dluLabel + '</div>' +
+      '</div>';
+    grid.appendChild(div);
+
+    /* QR code */
+    try {
+      new QRCode(document.getElementById('qr-'+idx), {
+        text: qrData,
+        width: 68, height: 68,
+        colorDark: '#2D0A18',
+        colorLight: '#ffffff',
+        correctLevel: QRCode.CorrectLevel.M
+      });
+    } catch(e){}
+  });
+
+  document.getElementById('print-title').textContent =
+    instrs.length + ' étiquette' + (instrs.length > 1 ? 's' : '') + ' — ' + num;
+
+  document.getElementById('form-screen').style.display = 'none';
+  document.getElementById('print-screen').style.display = 'block';
+  window.scrollTo(0,0);
+}
+
+function retour(){
+  document.getElementById('form-screen').style.display = 'block';
+  document.getElementById('print-screen').style.display = 'none';
+}
+</script>
+</body>
+</html>
